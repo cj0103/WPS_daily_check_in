@@ -32,11 +32,13 @@ def request_re(sid, invite_userid, rep = 30):
 
 for i in invite_userids:
     for j in sids:
-        r = request_re(j, i)
-        js = json.loads(r.content)
-        if js['result'] == 'ok':
-            mk += 1
-
+        try:
+            r = request_re(j, i)
+            js = json.loads(r.content)
+            if js['result'] == 'ok':
+                mk += 1
+        except:pass
+            
 print('成功邀请%d位好友'%(mk))   
 
 SERVER_KEY = os.getenv('SERVER_KEY')
@@ -46,3 +48,14 @@ if SERVER_KEY:
         'desp':'成功邀请%d位好友'%(mk)
     }
     requests.post('https://sc.ftqq.com/%s.send'%(SERVER_KEY.strip()), data = data)
+
+BARK_URL = os.getenv('BARK_URL')
+if BARK_URL:
+    text = 'WPS邀请好友任务：成功邀请到%d位好友'%(mk)
+    bark_url = BARK_URL[:-1] if BARK_URL.endswith('/') else BARK_URL
+    requests.get(bark_url + '/%s'%(text))
+    
+QMSG_KEY = os.getenv('QMSG_KEY')
+if QMSG_KEY:
+    text = 'WPS邀请好友任务：成功邀请到%d位好友'%(mk)
+    requests.get('https://qmsg.zendee.cn/send/%s?msg=%s'%(QMSG_KEY.strip(), text))
